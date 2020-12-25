@@ -7,25 +7,25 @@ import imutils
 import cv2
 import aruco_generator
 
-def get_ar_image(image, frame, positionDisplay):
+def get_ar_image(image, frame, position_display):
     """
     get ar image
     @param image ar image
     @param frame background has ArUCo code
     @param positionDisplay position of ArUCo corners
-    @return image has been perspective warping
+    @return image has been perspective warping with black background
     """
     size = image.shape
 
-    positionSrc = np.array([
+    position_src = np.array([
         [0, 0],
         [size[1] - 1, 0],
         [size[1] - 1, size[0] - 1],
         [0, size[0] - 1]
     ], dtype=float)
 
-    h, status = cv2.findHomography(positionSrc, positionDisplay)
-    return cv2.warpPerspective(imDisplay, h, (frame.shape[1], frame.shape[0]))
+    h, status = cv2.findHomography(position_src, position_display)
+    return cv2.warpPerspective(image, h, (frame.shape[1], frame.shape[0]))
 
 
 if __name__ == "__main__":
@@ -65,29 +65,18 @@ if __name__ == "__main__":
                 topLeft = (int(topLeft[0]), int(topLeft[1]))
 
 
-                cv2.line(frame, topLeft, topRight, (0, 255, 0), 2)
-                cv2.line(frame, topRight, bottomRight, (0, 255, 0), 2)
-                cv2.line(frame, bottomRight, bottomLeft, (0, 255, 0), 2)
-                cv2.line(frame, bottomLeft, topLeft, (0, 255, 0), 2)
+                # cv2.line(frame, topLeft, topRight, (0, 255, 0), 2)
+                # cv2.line(frame, topRight, bottomRight, (0, 255, 0), 2)
+                # cv2.line(frame, bottomRight, bottomLeft, (0, 255, 0), 2)
+                # cv2.line(frame, bottomLeft, topLeft, (0, 255, 0), 2)
 
-                center = (int((topLeft[0] + bottomRight[0]) / 2.0), int((topLeft[1] + bottomRight[1]) / 2.0))
+                # center = (int((topLeft[0] + bottomRight[0]) / 2.0), int((topLeft[1] + bottomRight[1]) / 2.0))
 
-                cv2.circle(frame, center, 4, (0, 0, 255), -1)
+                # cv2.circle(frame, center, 4, (0, 0, 255), -1)
 
                 imDisplay = cv2.imread("../nearest_neibor.jpg")
-                # size = imDisplay.shape
 
                 positionDisplay = np.array([topLeft, topRight, bottomRight, bottomLeft])
-                # positionSrc = np.array([
-                #     [0, 0],
-                #     [size[1] - 1, 0],
-                #     [size[1] - 1, size[0] - 1],
-                #     [0, size[0] - 1]
-                # ], dtype=float)
-
-                #project to aruco
-                # h, status = cv2.findHomography(positionSrc, positionDisplay)
-                # temp = cv2.warpPerspective(imDisplay, h, (frame.shape[1], frame.shape[0]))
                 #fill the ArUCo with black to simply add image to ArUCo
                 cv2.fillConvexPoly(frame, positionDisplay.astype(int), 0, 16)
                 frame = cv2.add(frame, get_ar_image(imDisplay, frame, positionDisplay))
